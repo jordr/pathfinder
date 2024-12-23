@@ -188,7 +188,7 @@ io::Output& LocalVariables::print(io::Output& out) const
 			{
 				out << "     \t| ";
 				for(labels_t::Iter li(*l[i]); li; li++)
-				// for(labels_t::Iterator li(*l[i]); li; li++)
+				// for(labels_t::Iter li(*l[i]); li; li++)
 					out << IntFormat((long int)(*li)).hex() << ", ";
 			}
 			out << endl;

@@ -94,7 +94,7 @@ bool DefaultAnalysis::inD_ip(const otawa::Edge* e) const
 
 // look for infeasible paths, add them to infeasible_paths, and removes the states from ss
 Analysis::IPStats DefaultAnalysis::ipcheck(States& ss, Vector<DetailedPath>& infeasible_paths) const
-// void Analysis::stateListToInfeasiblePathList(SLList<Option<Path> >& sl_paths, const SLList<Analysis::State>& sl, Edge* e, bool is_conditional)
+// void Analysis::stateListToInfeasiblePathList(elm::List<Option<Path> >& sl_paths, const elm::List<Analysis::State>& sl, Edge* e, bool is_conditional)
 {
 	IPStats stats;
 	if(flags&DRY_RUN) // no SMT call
@@ -136,7 +136,7 @@ Analysis::IPStats DefaultAnalysis::ipcheck(States& ss, Vector<DetailedPath>& inf
 		{
 			threads[i]->join();
 			DBGG("\t(joined #" << i+1 << ")")
-			for(SMTJob<chosen_smt_t>::Iterator ji(jobs[i]->getResults()); ji; ji++)
+			for(SMTJob<chosen_smt_t>::Iter ji(jobs[i]->getResults()); ji; ji++)
 			{
 				const State* s = (*ji).fst;
 				Option<Path*> infeasible_path = (*ji).snd;
@@ -168,7 +168,7 @@ Analysis::IPStats DefaultAnalysis::ipcheck(States& ss, Vector<DetailedPath>& inf
 		}
 	}
 
-	// cout << "["; for(Vector<Option<Path*> >::Iterator i(sv_paths); i; i++)
+	// cout << "["; for(Vector<Option<Path*> >::Iter i(sv_paths); i; i++)
 	// 	if(*i) cout << pathToString(***i) << ", "; cout << "\n";
 	if(flags&SHOW_PROGRESS)
 		delete sprogress;
@@ -223,10 +223,10 @@ Analysis::IPStats DefaultAnalysis::ipcheck(States& ss, Vector<DetailedPath>& inf
 	return stats;
 }
 
-/*SLList<Analysis::State> DefaultAnalysis::listOfS(const Vector<Edge*>& ins) const
+/*elm::List<Analysis::State> DefaultAnalysis::listOfS(const Vector<Edge*>& ins) const
 {
-	SLList<State> sl;
-	for(Vector<Edge*>::Iterator i(ins); i; i++)
+	elm::List<State> sl;
+	for(Vector<Edge*>::Iter i(ins); i; i++)
 		sl.addAll(EDGE_S.use(*i).states());
 	return sl;
 }*/

@@ -45,12 +45,12 @@ private:
 	void printInfeasiblePath(io::Output& FFXFile, const DetailedPath& ip);
 	void writeGraph(io::Output& GFile, const Vector<DetailedPath>& ips);
 	bool checkPathValidity(const DetailedPath& ip, bool critical) const;
-	static bool lastIsCaller(SLList<ffx_tag_t> open_tags);
-	inline bool edgeAfter(SLList<DetailedPath::FlowInfo>::Iterator iter) const
+	static bool lastIsCaller(elm::List<ffx_tag_t> open_tags);
+	inline bool edgeAfter(elm::List<DetailedPath::FlowInfo>::Iter iter) const
 		{ for(; iter; iter++) if(iter->isEdge()) return true; return false; }
 	void printInfeasiblePathOldNomenclature(io::Output& FFXFile, const DetailedPath& ip);
 
-	bool nextElementisCall(const DetailedPath::Iterator& iter, CFG* cfg);
+	bool nextElementisCall(const DetailedPath::Iter& iter, CFG* cfg);
 	elm::String indent(int indent_increase = 0);
 
 	Vector<DetailedPath> infeasible_paths;

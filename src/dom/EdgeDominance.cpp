@@ -23,7 +23,7 @@
  * EdgeDominance.cpp
  */
 
-#include <elm/genstruct/SLList.h>
+#include <elm/data/List.h>
 #include "EdgeDominance.h"
 #include "../cfg_features.h"
 
@@ -35,15 +35,15 @@ io::Output& operator<<(io::Output& out, otawa::sgraph::Edge* e) {
 }
 
 // void Order::process(DiGraph *g, Edge* start)
-void Order::process(DiGraph *g, genstruct::SLList<Edge*> S)
+void Order::process(DiGraph *g, elm::List<Edge*> S)
 {
 	/* O ← [] */ // order
 	O.clear();
 	/* S ← [e_ε] */ // stack
-	// genstruct::SLList<Edge*> S;
+	// elm::List<Edge*> S;
 	// S.add(start);
 	/* D ← { } */ // done
-	genstruct::Vector<Edge*> D;
+	Vector<Edge*> D;
 	/* while S ≠ [] do */
 	while(S) {
 		/* v ← hd S */

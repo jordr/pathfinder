@@ -23,14 +23,14 @@
 #define _PROGRESS_H
 
 #include <ctime> // clock
-#include <elm/genstruct/HashTable.h>
+#include <elm/data/HashTable.h>
 #include <elm/string/String.h>
 #include <otawa/cfg/CFG.h>
 #include "analysis.h"
 #include "debug.h"
 #include "cfg_features.h"
 
-using elm::genstruct::HashTable;
+using elm::data::HashTable;
 using otawa::Block;
 
 // solver progress bar

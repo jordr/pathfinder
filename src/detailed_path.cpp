@@ -31,9 +31,9 @@ extern bool cfg_follow_calls;
  * @brief A path enriched with flowfact information such as loops, calls, etc.
  */
 /**
- * @class DetailedPath::Iterator
+ * @class DetailedPath::Iter
  * @author Jordy Ruiz 
- * @brief Iterator on all the compounds of the DetailedPath
+ * @brief Iter on all the compounds of the DetailedPath
  */
 /**
  * @class DetailedPath::FlowInfo
@@ -43,14 +43,14 @@ extern bool cfg_follow_calls;
 /**
  * @class DetailedPath::EdgeIterator
  * @author Jordy Ruiz 
- * @brief Iterator only on the actual edges of the DetailedPath
+ * @brief Iter only on the actual edges of the DetailedPath
  */
 
 DetailedPath::DetailedPath(CFG* f) : fun(f) { }
 DetailedPath::DetailedPath(BasicBlock* bb) : fun(NULL) { fromContext(bb); }
-// DetailedPath::DetailedPath(const SLList<Edge*>& edge_list) : fun(NULL)
+// DetailedPath::DetailedPath(const elm::List<Edge*>& edge_list) : fun(NULL)
 // {
-// 	for(SLList<Edge*>::Iterator iter(edge_list); iter; iter++)
+// 	for(elm::List<Edge*>::Iter iter(edge_list); iter; iter++)
 // 		this->addLast(*iter);
 // }
 DetailedPath::DetailedPath(const DetailedPath& dp) : _path(dp._path), fun(dp.fun) { }
@@ -68,7 +68,7 @@ DetailedPath::DetailedPath(const DetailedPath& dp) : _path(dp._path), fun(dp.fun
 void DetailedPath::addLast(Edge* e)
 	{ _path.addLast(FlowInfo(FlowInfo::KIND_EDGE, e)); }
 
-void DetailedPath::addBefore(const Iterator &pos, const FlowInfo &value)
+void DetailedPath::addBefore(const Iter &pos, const FlowInfo &value)
 	{ _path.addBefore(pos, value); }
 
 /**
@@ -90,10 +90,10 @@ void DetailedPath::optimize()
 
 void DetailedPath::removeDuplicates()
 {
-	Iterator iter(*this), prev(*this);
+	Iter iter(*this), prev(*this);
 	if(!iter) // make sure the detailed path is not empty
 		return;
-	for(iter++; iter; prev++, iter++)
+	for(iter++; !iter.ended(); prev++, iter++)
 	{
 		if(    ((iter->isLoopEntry() && prev->isLoopEntry()) || (iter->isLoopExit() && prev->isLoopExit()))
 			&& (iter->getLoopHeader() == prev->getLoopHeader()))
@@ -106,10 +106,10 @@ void DetailedPath::removeDuplicates()
 
 void DetailedPath::removeAntagonists()
 {
-	Iterator iter(*this), prev(*this);
+	Iter iter(*this), prev(*this);
 	if(!iter) // make sure the detailed path is not empty
 		return;
-	for(iter++; iter; prev++, iter++)
+	for(iter++; !iter.ended(); prev++, iter++)
 	{
 		if( (iter->isLoopExit() && prev->isLoopEntry() && iter->getLoopHeader() == prev->getLoopHeader())
 		 || (iter->isReturn()	&& prev->isCall()	   && iter->getCaller()		== prev->getCaller()	))
@@ -124,14 +124,14 @@ void DetailedPath::removeAntagonists()
 
 void DetailedPath::removeCallsAtEndOfPath()
 {
-	Iterator last_edge_iter(*this);
-	for(Iterator iter(*this); iter; iter++)
+	Iter last_edge_iter(*this);
+	for(Iter iter(*this); !iter.ended(); iter++)
 		if(iter->isEdge())
 			last_edge_iter = iter;
 	// last_edge_iter is now at the position of the last edge in the path
 	if(!last_edge_iter)
 		return; // nothing remains, exit
-	for(last_edge_iter++; last_edge_iter; )
+	for(last_edge_iter++; !last_edge_iter.ended(); )
 		if(last_edge_iter->isCall())
 			remove(last_edge_iter);
 		else last_edge_iter++;
@@ -209,7 +209,7 @@ void DetailedPath::onReturn(SynthBlock* sb)
 bool DetailedPath::weakEqualsTo(const DetailedPath& dp) const
 {
 	EdgeIterator dp_iter(dp), this_iter(*this);
-	while(dp_iter && this_iter)
+	while(!dp_iter.ended() && !this_iter.ended())
 	{
 		if(*this_iter != *dp_iter) // compare edge*
 			return false; // not equal
@@ -240,14 +240,14 @@ void DetailedPath::merge(const Vector<DetailedPath>& paths)
 		For example, when p=Path#2, p (C#8) does not contain this->_path (C#8, C#24) does not contain p, so we remove C#24 from this->_path
 	*/ 
 	bool first = true;
-	for(Vector<DetailedPath>::Iter paths_iter(paths); paths_iter; paths_iter++)
+	for(Vector<DetailedPath>::Iter paths_iter(paths); !paths_iter.ended(); paths_iter++)
 	{
 		const DetailedPath &p = *paths_iter;
 		if(first) // Path#0: initialize this->_path
 		{
 			first = false;
 			// this->_path initialized with all calls contained in paths[0]
-			for(DetailedPath::Iterator p_flowinfo_iter(p); p_flowinfo_iter; p_flowinfo_iter++)
+			for(DetailedPath::Iter p_flowinfo_iter(p); p_flowinfo_iter; p_flowinfo_iter++)
 			{
 				if(p_flowinfo_iter->isCall() || p_flowinfo_iter->isReturn())
 					this->_path.addLast(*p_flowinfo_iter); // use addLast instead of addFirst to preserve order of calls
@@ -256,7 +256,7 @@ void DetailedPath::merge(const Vector<DetailedPath>& paths)
 		}
 		else
 		{
-			for(DetailedPath::Iterator this_iter(*this); this_iter; ) // for each element in this->_path
+			for(DetailedPath::Iter this_iter(*this); this_iter; ) // for each element in this->_path
 			{
 				if(!p.contains(this_iter)) // if it is not in p
 				{
@@ -276,11 +276,11 @@ void DetailedPath::merge(const Vector<DetailedPath>& paths)
 		// DBGG(color::IYel() << "result: " << toString())
 /*
 	int merge_count = 0;
-	for(Vector<DetailedPath>::Iterator iter(paths); iter; iter++)
+	for(Vector<DetailedPath>::Iter iter(paths); iter; iter++)
 		cout << color::IRed() << "\tmerge[" << merge_count++ << "]=" << *iter << io::endl;
 	cout << color::RCol();
 	Edge* first_call = NULL;
-	for(Iterator this_iter(paths.first()); this_iter; this_iter++)
+	for(Iter this_iter(paths.first()); this_iter; this_iter++)
 	{
 		if(this_iter->isCall())
 		{
@@ -292,10 +292,10 @@ void DetailedPath::merge(const Vector<DetailedPath>& paths)
 		return; // nothing to do
 	else cout << color::ICya() << "is call:" << first_call << color::RCol() << io::endl;
 	int count = 0;
-	for(Vector<DetailedPath>::Iterator paths_iter(paths); paths_iter; paths_iter++)
+	for(Vector<DetailedPath>::Iter paths_iter(paths); paths_iter; paths_iter++)
 	{
 		cout << "DP#" << count++ << ": ";
-		for(DetailedPath::Iterator flowinfo_iter(*paths_iter); flowinfo_iter; flowinfo_iter++)
+		for(DetailedPath::Iter flowinfo_iter(*paths_iter); flowinfo_iter; flowinfo_iter++)
 		{
 			if(flowinfo_iter->isCall())
 				cout << flowinfo_iter->toString() << ", ";
@@ -307,7 +307,7 @@ void DetailedPath::merge(const Vector<DetailedPath>& paths)
 
 void DetailedPath::apply(const DetailedPath& path)
 {
-	for(SLList<FlowInfo>::Iterator i(path._path); i; i++)
+	for(elm::List<FlowInfo>::Iter i(path._path); !i.ended(); i++)
 		this->_path.addLast(*i);
 }
 
@@ -338,7 +338,7 @@ Edge* DetailedPath::lastEdge() const
 Option<Block*> DetailedPath::lastBlock() const
 {
 	Option<Block*> rtn = none;
-	for(SLList<FlowInfo>::Iterator iter(_path); iter; iter++)
+	for(elm::List<FlowInfo>::Iter iter(_path); !iter.ended(); iter++)
 	{
 		if(iter->isEdgeKind())
 			rtn = some(iter->getEdge()->target());
@@ -353,15 +353,15 @@ Option<Block*> DetailedPath::lastBlock() const
 int DetailedPath::countEdges() const
 {
 	int count = 0;
-	for(SLList<FlowInfo>::Iterator iter(_path); iter; iter++)
+	for(elm::List<FlowInfo>::Iter iter(_path); !iter.ended(); iter++)
 		if((*iter).isEdge())
 			count++;
 	return count;
 }
 
-SLList<Edge*> DetailedPath::toOrderedPath() const
+elm::List<Edge*> DetailedPath::toOrderedPath() const
 {
-	SLList<Edge*> rtn;
+	elm::List<Edge*> rtn;
 	for(EdgeIterator iter(*this); iter; iter++)
 		rtn.addLast(*iter);
 	return rtn;
@@ -374,7 +374,7 @@ elm::String DetailedPath::toString(bool colored) const
 	{
 		// show the list of flowinfo and edges
 		bool first = true;
-		for(Iterator iter(*this); iter; iter++)
+		for(Iter iter(*this); iter; iter++)
 		{
 			if(first) first = false; else
 				str = str.concat(_ << ", ");
@@ -387,7 +387,7 @@ elm::String DetailedPath::toString(bool colored) const
 		bool comma = false;
 		// if(countEdges() > 0)
 		// 	str = _ << color::Dim() << firstEdge()->source()->cfg() << "(" << color::NoDim();
-		for(Iterator iter(*this); iter; iter++)
+		for(Iter iter(*this); iter; iter++)
 		{
 			switch(iter->kind())
 			{
@@ -475,10 +475,10 @@ io::Output& DetailedPath::FlowInfo::print(io::Output& out) const
 }
 
 
-/*void InfeasiblePaths::addDisorderedPath(const Set<Edge*>& infeasible_path, const SLList<Edge*>& full_path, Edge* last_edge)
+/*void InfeasiblePaths::addDisorderedPath(const Set<Edge*>& infeasible_path, const elm::List<Edge*>& full_path, Edge* last_edge)
 {
-	SLList<Edge*> ordered_ip;
-	for(SLList<Edge*>::Iterator full_path_iter(full_path); full_path_iter; full_path_iter++)
+	elm::List<Edge*> ordered_ip;
+	for(elm::List<Edge*>::Iter full_path_iter(full_path); full_path_iter; full_path_iter++)
 	{
 		if(infeasible_path.contains(*full_path_iter))
 			ordered_ip.addLast(*full_path_iter);

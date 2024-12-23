@@ -24,19 +24,23 @@
 
 #include <otawa/cfg.h> // Block
 #include <elm/avl/Set.h>
-#include <elm/genstruct/SLList.h>
+#include <elm/data/List.h>
+#include <elm/data/Vector.h>
 #include <elm/io/Output.h>
 #include "debug.h"
 using elm::io::Output;
-using elm::genstruct::SLList;
+template<typename T>
+using SLList = elm::List<T>;
+using elm::_;
+using elm::Vector;
 using elm::avl::Set;
 
 
 // pretty printing
 void addIndents(Output& out, int n);
 template <class I> Output& printCollection(Output& out, I items, int size);
-template <class T> inline Output& operator<<(Output& out, const SLList<T>& l)
-	{ return printCollection(out, typename SLList<T>::Iterator(l), l.count()); }
+template <class T> inline Output& operator<<(Output& out, const elm::List<T>& l)
+	{ return printCollection(out, typename elm::List<T>::Iter(l), l.count()); }
 template <class T> inline Output& operator<<(Output& out, const Vector<T>& v)
 	{ return printCollection(out, typename Vector<T>::Iter(v), v.count()); }
 Output& otawa::operator<<(Output& out, otawa::Block* b);

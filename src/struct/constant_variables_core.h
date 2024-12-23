@@ -23,7 +23,7 @@
 #define _CONSTANT_VARIABLES_CORE_H
 
 #include <elm/avl/Set.h>
-// #include <elm/genstruct/SLList.h>
+// #include <elm/data/List.h>
 #include <otawa/cfg/Edge.h>
 #include "constant.h"
 #include "../debug.h"
@@ -93,7 +93,7 @@ public:
 	inline bool isConstant(t::int32 var_id) const { return getCell(var_id).exists(); }
 	inline Constant getValue(t::int32 var_id) const { return getCell(var_id).val(); }
 	void label(Edge* label);
-	// void merge(const SLList<ConstantVariablesCore>& cvl);
+	// void merge(const elm::List<ConstantVariablesCore>& cvl);
 	elm::String printChanges() const;
 	ConstantVariablesCore& operator=(const ConstantVariablesCore& cv);
 	bool operator==(const ConstantVariablesCore& cv) const; // strict

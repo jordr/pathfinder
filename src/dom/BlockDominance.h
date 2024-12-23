@@ -28,10 +28,10 @@
 
 #include <otawa/cfg.h>
 #include <otawa/cfg/features.h>
-#include <otawa/graph/GenGraph.h>
-#include <otawa/sgraph/DiGraph.h>
+#include <otawa/ograph/GenGraph.h>
+#include <otawa/graph/DiGraph.h>
 #include <otawa/prog/WorkSpace.h>
-#include <elm/genstruct/HashTable.h>
+#include <elm/data/HashTable.h>
 
 // using namespace elm;
 using otawa::sgraph::DiGraph;
@@ -45,9 +45,9 @@ public:
 	class RPO {
 	public:
 		RPO(DiGraph* g) { process(g); }
-		const genstruct::SLList<Vertex*>& toList() const { return O; }
+		const elm::List<Vertex*>& toList() const { return O; }
 		bool ordered(Vertex* a, Vertex* b) const { // test a <= b
-			for(Iterator i(O); i; i++) {
+			for(Iter i(O); i; i++) {
 				if(*i == a) return true; // a <= b
 				if(*i == b) return false; // a > b
 			}
@@ -55,11 +55,11 @@ public:
 		}
 		inline bool strictOrdered(Vertex* a, Vertex* b) const { return !ordered(a,b); } // a < b = !(b <= a)
 
-		typedef genstruct::SLList<Vertex*>::Iterator Iterator;
+		typedef elm::List<Vertex*>::Iter Iter;
 
 	private:
 		void process(DiGraph *g);
-		genstruct::SLList<Vertex*> O;
+		elm::List<Vertex*> O;
 	};
 
 	BlockDominance(DiGraph *g) : rpo(g) {
@@ -81,16 +81,16 @@ private:
 	inline friend io::Output& operator<<(io::Output& out, const BlockDominance& ed) { return ed.print(out); }
 	
 	RPO rpo;
-	genstruct::HashTable<Vertex*, Vertex*> doms;
+	elm::HashTable<Vertex*, Vertex*> doms;
 };
 
 template<class Vertex, class Edge>
 class RPOGen {
 public:
 	RPOGen(GenGraph<Vertex, Edge>* g, Vertex* entry) { process(g, entry); }
-	const genstruct::SLList<Vertex*>& toList() const { return O; }
+	const elm::List<Vertex*>& toList() const { return O; }
 	bool ordered(Vertex* a, Vertex* b) const { // test a <= b
-		for(Iterator i(O); i; i++) {
+		for(Iter i(O); i; i++) {
 			if(*i == a) return true; // a <= b
 			if(*i == b) return false; // a > b
 		}
@@ -98,17 +98,17 @@ public:
 	}
 	inline bool strictOrdered(Vertex* a, Vertex* b) const { return !ordered(a,b); } // a < b = !(b <= a)
 
-	typedef typename genstruct::SLList<Vertex*>::Iterator Iterator;
+	typedef typename elm::List<Vertex*>::Iter Iter;
 
 private:
 	void process(GenGraph<Vertex, Edge> *g, Vertex* entry) {
 		/* O ← [] */ // order
 		O.clear();
 		/* S ← [ε] */ // stack
-		genstruct::SLList<Vertex*> S;
+		elm::List<Vertex*> S;
 		S.add(entry);
 		/* D ← { } */ // done
-		genstruct::Vector<Vertex*> D;
+		Vector<Vertex*> D;
 		/* while S ≠ [] do */
 		while(S) {
 			/* v ← hd S */
@@ -136,7 +136,7 @@ private:
 			}
 		}
 	}
-	genstruct::SLList<Vertex*> O;
+	elm::List<Vertex*> O;
 };
 
 template<class Vertex, class Edge>
@@ -168,7 +168,7 @@ private:
 			/* Changed ← false */
 			changed = false;
 			/* for all nodes, b, in reverse postorder (except start node) */
-			for(typename RPOGen<Vertex, Edge>::Iterator b(rpo.toList()); b; b++) {
+			for(typename RPOGen<Vertex, Edge>::Iter b(rpo.toList()); b; b++) {
 				if(b == entry)
 					continue;
 				/* new idom ← first (processed) predecessor of b // (pick one) */
@@ -213,7 +213,7 @@ private:
 
 	io::Output& print(io::Output& out) const {
 		bool first = true;
-		for(typename genstruct::HashTable<Vertex*, Vertex*>::PairIterator i(doms); i; i++) {
+		for(typename elm::HashTable<Vertex*, Vertex*>::PairIterator i(doms); i; i++) {
 			out << (first?"":",  ") << (*i).fst << ":" << (*i).snd;
 			first = false;
 		}
@@ -222,7 +222,7 @@ private:
 	inline friend io::Output& operator<<(io::Output& out, const BlockDominanceGen& ed) { return ed.print(out); }
 	
 	RPOGen<Vertex, Edge> rpo;
-	genstruct::HashTable<Vertex*, Vertex*> doms;
+	elm::HashTable<Vertex*, Vertex*> doms;
 };
 
 #endif /* BLOCKDOMINANCE_H */

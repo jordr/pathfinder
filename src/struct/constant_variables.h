@@ -42,7 +42,7 @@ public:
 	~ConstantVariables() { }
 
 	inline bool isConstant(const OperandVar& opdv) const { return ConstantVariablesCore::isConstant(opdv.addr()); }
-	void merge(const SLList<ConstantVariables>& cvl);
+	void merge(const elm::List<ConstantVariables>& cvl);
 	inline Constant getValue(const OperandVar& opdv) const
 		{ return ConstantVariablesCore::getValue(opdv.addr()); } // this must not be called if !isConstant(opdv)...
 	Set<Edge*> getLabels(const OperandVar& opdv) const; // same
@@ -59,7 +59,7 @@ public:
 	bool invalidateTempVars();
 	inline Constant operator[](const OperandVar& opdv) const { return getValue(opdv); }
 	friend io::Output& operator<<(io::Output& out, const ConstantVariables& cv) { return operator<<(out, static_cast<ConstantVariablesCore>(cv)); }
-	SLList<LabelledPredicate> toPredicates(DAG& dag) const;
+	elm::List<LabelledPredicate> toPredicates(DAG& dag) const;
 
 private:
 	inline LabelledValue& getCell(const OperandVar& opdv) const

@@ -35,11 +35,11 @@ DAG::~DAG(void)
 	for(int i = 0; i < tmp_cnt + var_cnt; i++)
 		delete vars[i];
 	delete [] vars;
-	for(cst_map_t::Iterator cst(cst_map); cst; cst++)
+	for(cst_map_t::Iter cst(cst_map); cst; cst++)
 		delete *cst;
-	for(op_map_t::Iterator op(op_map); op; op++)
+	for(op_map_t::Iter op(op_map); op; op++)
 		delete *op;
-	for(pred_map_t::Iterator pred(pred_map); pred; pred++)
+	for(pred_map_t::Iter pred(pred_map); pred; pred++)
 		delete *pred;
 }
 

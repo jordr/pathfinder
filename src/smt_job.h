@@ -49,7 +49,7 @@ public:
 	const data_t& getResults() const
 		{ return data; }
 
-	typedef data_t::Iter Iterator;
+	typedef data_t::Iter Iter;
 
 private:
 	int flags;

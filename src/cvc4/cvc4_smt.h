@@ -32,7 +32,6 @@
 #include "cvc4_operand_visitor.h"
 #include "cvc4_variable_stack.h"
 
-// using namespace elm::genstruct;
 using namespace CVC4::kind;
 using CVC4::Expr;
 
@@ -46,14 +45,14 @@ private:
 	CVC4::ExprManager em;
 	CVC4::SmtEngine smt;
 	CVC4VariableStack variables;
-	SLList<Option<Expr> > exprs;
+	elm::List<Option<Expr> > exprs;
 
 	// SMT virtual pure methods
-	void initialize(const SLList<LabelledPredicate>& labelled_preds);
-	void initialize(const LocalVariables& lv, const genstruct::HashTable<Constant, const Operand*, ConstantHash>& mem, DAG& dag);
+	void initialize(const elm::List<LabelledPredicate>& labelled_preds);
+	void initialize(const LocalVariables& lv, const elm::HashTable<Constant, const Operand*, ConstantHash>& mem, DAG& dag);
 	bool checkPredSat();
-	bool retrieveUnsatCore(Analysis::Path& path, const SLList<LabelledPredicate>& labelled_preds, std::basic_string<char>& unsat_core_output);
-	// bool checkPredSat(const SLList<LabelledPredicate>& labelled_preds);
+	bool retrieveUnsatCore(Analysis::Path& path, const elm::List<LabelledPredicate>& labelled_preds, std::basic_string<char>& unsat_core_output);
+	// bool checkPredSat(const elm::List<LabelledPredicate>& labelled_preds);
 	Option<Expr> getExpr(const Predicate& p);
 	Option<Expr> getExpr(const Operand& o);
 	inline Expr getRegExpr(t::int32 reg_id)

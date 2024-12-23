@@ -19,7 +19,7 @@
  *	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <elm/genstruct/SLList.h>
+#include <elm/data/List.h>
 #include "smt.h"
 #include "debug.h"
 
@@ -40,7 +40,7 @@ Option<Analysis::Path*> SMT::seekInfeasiblePaths(const Analysis::State& s)
 {
 #ifdef V1
 	// add the constant info to the the list of predicates
-	SLList<LabelledPredicate> labelled_preds = s.getLabelledPreds(); // implicit copy
+	elm::List<LabelledPredicate> labelled_preds = s.getLabelledPreds(); // implicit copy
 	labelled_preds += s.getConstants().toPredicates(s.getDag());
 	
 	initialize(labelled_preds);
@@ -60,7 +60,7 @@ Option<Analysis::Path*> SMT::seekInfeasiblePaths(const Analysis::State& s)
 	{
 		DBG(color::BIWhi() << "A)" << color::RCol() << " Extracting UNSAT core... " << color::IRed() << "FAILED!");
 		DBG("   Using original predicates:")
-		for(SLList<LabelledPredicate>::Iterator parse_iter(labelled_preds); parse_iter; parse_iter++)
+		for(elm::List<LabelledPredicate>::Iter parse_iter(labelled_preds); parse_iter; parse_iter++)
 		{
 			if((*parse_iter).pred().isComplete())
 			{
@@ -99,7 +99,7 @@ Option<Analysis::Path*> SMT::seekInfeasiblePathsv2(const Analysis::State& s)
 		if(dbg_verbose == DBG_VERBOSE_ALL) cout << color::BIRed() << "UNSAT\n";
 
 		DBG("   Predicates:")
-		for(SLList<LabelledPredicate>::Iterator parse_iter(s.getLabelledPreds()); parse_iter; parse_iter++)
+		for(elm::List<LabelledPredicate>::Iter parse_iter(s.getLabelledPreds()); parse_iter; parse_iter++)
 			if((*parse_iter).pred().isComplete())
 				DBG("   * " << (*parse_iter))
 		// TODO!! we need to implement labels on memory, and use those to minimize IPs.
@@ -128,11 +128,11 @@ const elm::String SMT::printChosenSolverInfo()
 }
 
 /*
-bool SMT::checkPredSat(const SLList<LabelledPredicate>& labelled_preds)
+bool SMT::checkPredSat(const elm::List<LabelledPredicate>& labelled_preds)
 {	
 	try
 	{
-		for(SLList<LabelledPredicate>::Iterator iter(labelled_preds); iter; iter++)
+		for(elm::List<LabelledPredicate>::Iter iter(labelled_preds); iter; iter++)
 			if(Option<Expr> expr = getExpr(iter->pred()))
 				smt.assertFormula(*expr); // second parameter to true for unsat cores
 
@@ -148,14 +148,14 @@ bool SMT::checkPredSat(const SLList<LabelledPredicate>& labelled_preds)
 	}
 }
 
-void SMT::removeIncompletePredicates(SLList<LabelledPredicate>& labelled_preds)
+void SMT::removeIncompletePredicates(elm::List<LabelledPredicate>& labelled_preds)
 {
-	SLList<LabelledPredicate>::Iterator iter(labelled_preds);
+	elm::List<LabelledPredicate>::Iter iter(labelled_preds);
 	while(iter)
 	{
 		if(!iter->pred().isComplete())
 		{
-			SLList<LabelledPredicate>::Iterator prev_iter(iter);
+			elm::List<LabelledPredicate>::Iter prev_iter(iter);
 			iter++;
 			labelled_preds.remove(prev_iter);
 		}
@@ -164,11 +164,11 @@ void SMT::removeIncompletePredicates(SLList<LabelledPredicate>& labelled_preds)
 	}
 }
 
-SLList<Analysis::Path> SMT::getAllInfeasiblePaths(const SLList<LabelledPredicate>& labelled_preds, int index)
+elm::List<Analysis::Path> SMT::getAllInfeasiblePaths(const elm::List<LabelledPredicate>& labelled_preds, int index)
 {	// Algorithm 3 (n~2^n)
 	bool index_in_range = false;
-	SLList<LabelledPredicate> labelled_preds_truncated = labelled_preds;
-	SLList<LabelledPredicate>::Iterator iter(labelled_preds_truncated);
+	elm::List<LabelledPredicate> labelled_preds_truncated = labelled_preds;
+	elm::List<LabelledPredicate>::Iter iter(labelled_preds_truncated);
 	for(int i = 0; iter; iter++)
 	{
 		if(i++ == index)
@@ -179,9 +179,9 @@ SLList<Analysis::Path> SMT::getAllInfeasiblePaths(const SLList<LabelledPredicate
 	}
 	if(!index_in_range) // we're done parsing predicates
 	{
-		Analysis::Path path; // typedef SLList<const Edge*> Path;
-		SLList<Analysis::Path> path_list;
-		for(SLList<LabelledPredicate>::Iterator parse_iter(labelled_preds); parse_iter; parse_iter++)
+		Analysis::Path path; // typedef elm::List<const Edge*> Path;
+		elm::List<Analysis::Path> path_list;
+		for(elm::List<LabelledPredicate>::Iter parse_iter(labelled_preds); parse_iter; parse_iter++)
 			path += (*parse_iter).labels();
 		path_list += path;
 		return path_list;
@@ -196,20 +196,20 @@ SLList<Analysis::Path> SMT::getAllInfeasiblePaths(const SLList<LabelledPredicate
 	}
 	else
 	{	// UNSAT: fork
-		SLList<Analysis::Path> paths = getAllInfeasiblePaths(labelled_preds_truncated, index); // without the unnecessary predicate
+		elm::List<Analysis::Path> paths = getAllInfeasiblePaths(labelled_preds_truncated, index); // without the unnecessary predicate
 							   paths+= getAllInfeasiblePaths(labelled_preds,         index+1); // with the unnecessary predicate
 		return paths;
 	}
 }
 
 // generate maps
-void SMT::genPathPointBitMaps(const SLList<Analysis::Path>& paths, AVLMap<const Edge*, unsigned int>& map_pathpoint_to_bit, Vector<const Edge*>& map_bit_to_pathpoint)
+void SMT::genPathPointBitMaps(const elm::List<Analysis::Path>& paths, AVLMap<const Edge*, unsigned int>& map_pathpoint_to_bit, Vector<const Edge*>& map_bit_to_pathpoint)
 {
 	unsigned int bit_count = 0;
-	for(SLList<Analysis::Path>::Iterator iter(paths); iter; iter++)
+	for(elm::List<Analysis::Path>::Iter iter(paths); iter; iter++)
 	{
 		Analysis::Path p = *iter;
-		for(Analysis::Path::Iterator subiter(p); subiter; subiter++)
+		for(Analysis::Path::Iter subiter(p); subiter; subiter++)
 		{
 			if(!map_pathpoint_to_bit.hasKey(*subiter))
 			{
@@ -222,15 +222,15 @@ void SMT::genPathPointBitMaps(const SLList<Analysis::Path>& paths, AVLMap<const 
 }
 
 // map paths to bitcodes
-SLList<BitVector> SMT::genBitCodes(const SLList<Analysis::Path>& paths, const AVLMap<const Edge*, unsigned int>& map_pathpoint_to_bit, unsigned int used_bits)
+elm::List<BitVector> SMT::genBitCodes(const elm::List<Analysis::Path>& paths, const AVLMap<const Edge*, unsigned int>& map_pathpoint_to_bit, unsigned int used_bits)
 {
 	BitVector bitcode(used_bits);
-	SLList<BitVector> bitcode_list;
-	for(SLList<Analysis::Path>::Iterator iter(paths); iter; iter++)
+	elm::List<BitVector> bitcode_list;
+	for(elm::List<Analysis::Path>::Iter iter(paths); iter; iter++)
 	{
 		bitcode.clear();
 		Analysis::Path p = *iter;
-		for(Analysis::Path::Iterator subiter(p); subiter; subiter++)
+		for(Analysis::Path::Iter subiter(p); subiter; subiter++)
 			bitcode.set(*map_pathpoint_to_bit.get(*subiter));
 			// bitcode |= 1u << *map_pathpoint_to_bit.get(*subiter);
 		bitcode_list += bitcode;
@@ -238,17 +238,17 @@ SLList<BitVector> SMT::genBitCodes(const SLList<Analysis::Path>& paths, const AV
 	return bitcode_list;
 }
 
-BitVector SMT::getListOfPathsToKeep(const SLList<BitVector>& bitcode_list)
+BitVector SMT::getListOfPathsToKeep(const elm::List<BitVector>& bitcode_list)
 {
 	const int number_of_paths = bitcode_list.count();
 	BitVector paths_to_keep(number_of_paths, true); // a priori, keep all paths
 	int i = 0;
-	for(SLList<BitVector>::Iterator iter(bitcode_list); iter; iter++, i++)
+	for(elm::List<BitVector>::Iter iter(bitcode_list); iter; iter++, i++)
 	{
 		if(!paths_to_keep[i])
 			continue;
 
-		SLList<BitVector>::Iterator subiter(iter);
+		elm::List<BitVector>::Iter subiter(iter);
 		subiter++;
 		for(int j = i+1; subiter; subiter++, j++)
 		{
@@ -270,11 +270,11 @@ BitVector SMT::getListOfPathsToKeep(const SLList<BitVector>& bitcode_list)
 	return paths_to_keep;
 }
 
-SLList<Analysis::Path> SMT::filterPaths(const SLList<BitVector>& bitcode_list, const Vector<const Edge*>& map_bit_to_pathpoint, const BitVector& paths_to_keep, bool print_results)
+elm::List<Analysis::Path> SMT::filterPaths(const elm::List<BitVector>& bitcode_list, const Vector<const Edge*>& map_bit_to_pathpoint, const BitVector& paths_to_keep, bool print_results)
 {
-	SLList<Analysis::Path> filtered_paths;
+	elm::List<Analysis::Path> filtered_paths;
 	int index = 0;
-	for(SLList<BitVector>::Iterator iter(bitcode_list); iter; iter++, index++)
+	for(elm::List<BitVector>::Iter iter(bitcode_list); iter; iter++, index++)
 	{
 		if(!paths_to_keep[index])
 			continue;

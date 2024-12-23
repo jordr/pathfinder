@@ -204,7 +204,7 @@ io::Output& ConstantVariablesCore::LabelledValue::print(io::Output& out) const
 	{
 		out << "(";
 		bool first_time = true;
-		for(Set<Edge*>::Iterator iter(*_labels); iter; iter++)
+		for(Set<Edge*>::Iter iter(*_labels); iter; iter++)
 		{
 			if(first_time)
 				first_time = false;

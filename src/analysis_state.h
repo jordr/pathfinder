@@ -23,8 +23,8 @@
 #define _ANALYSIS_STATE_H
 
 #include <elm/avl/Set.h>
-#include <elm/genstruct/HashTable.h>
-// #include <elm/genstruct/SLList.h>
+#include <elm/data/HashTable.h>
+// #include <elm/data/List.h>
 #include <otawa/cfg/Edge.h>
 #include <otawa/cfg/features.h>
 #include <otawa/dfa/State.h> // dfa::State: isInitialized(addr), get(addr, _)...
@@ -40,13 +40,13 @@
 
 using namespace otawa;
 using otawa::sem::PathIter;
-using elm::genstruct::HashTable;
-using elm::genstruct::SLList;
+using elm::data::HashTable;
+
 
 class Widenor;
 class Analysis::State {
 private:
-	typedef elm::genstruct::HashTable<Constant, const Operand*, ConstantHash> mem_t;
+	typedef elm::data::HashTable<Constant, const Operand*, ConstantHash> mem_t;
 
 	const context_t* context;
 	// v2
@@ -66,9 +66,9 @@ private:
 #ifdef V1
 	ConstantVariables constants; // remember in an array the variables that have been identified to a constant (e.g. t2 = 4)
 #endif
-	SLList<LabelledPredicate> labelled_preds; // previously generated predicates
-	SLList<LabelledPredicate> generated_preds; // predicates local to the current BB
-	SLList<LabelledPredicate> generated_preds_taken; // if there is a conditional, the taken preds will be saved here and the not taken preds will stay in generated_preds
+	elm::List<LabelledPredicate> labelled_preds; // previously generated predicates
+	elm::List<LabelledPredicate> generated_preds; // predicates local to the current BB
+	elm::List<LabelledPredicate> generated_preds_taken; // if there is a conditional, the taken preds will be saved here and the not taken preds will stay in generated_preds
 		// that have been updated and need to have their labels list updated (add the next edge to the LabelledPreds struct)
 	class PredIterator;
 	class SemanticParser;
@@ -80,7 +80,7 @@ public:
 	State(const State& s);
 	inline const DetailedPath& getDetailedPath() const { return path; }
 	inline Edge* lastEdge() const { return path.lastEdge(); }
-	inline const SLList<LabelledPredicate>& getLabelledPreds() const { return labelled_preds; }
+	inline const elm::List<LabelledPredicate>& getLabelledPreds() const { return labelled_preds; }
 #ifdef V1
 	inline const ConstantVariables& getConstants() const { return constants; }
 #endif
@@ -133,7 +133,7 @@ private:
 	void setPredicate(PredIterator &iter, const LabelledPredicate &labelled_predicate);
 	void movePredicateToGenerated(PredIterator &iter);
 	void removePredicate(PredIterator &iter);
-	SLList<LabelledPredicate> labelPredicateList(const SLList<LabelledPredicate>& pred_list, Edge* label);
+	elm::List<LabelledPredicate> labelPredicateList(const elm::List<LabelledPredicate>& pred_list, Edge* label);
 	io::Output& print(io::Output& out) const;
 
 	// analysis_bb2.cpp
@@ -189,7 +189,7 @@ private:
 		inline bool operator[](Pair<Constant, const Operand*> pair) const { return mems.contains(pair.fst); }
 
 		io::Output& printMems(io::Output& out) const {
-			for(Set<Constant>::Iterator i(mems); i; i++)
+			for(Set<Constant>::Iter i(mems); i; i++)
 				out << *i << ", ";
 			return out;
 		}
@@ -259,8 +259,8 @@ private:
 		}
 		friend class Analysis::State;
 		pred_iterator_state_t state;
-		SLList<LabelledPredicate>::Iterator gp_iter; // Generated predicates (local) iterator 
-		SLList<LabelledPredicate>::Iterator lp_iter; // Labelled predicates (previous BBs) iterator
+		elm::List<LabelledPredicate>::Iter gp_iter; // Generated predicates (local) iterator 
+		elm::List<LabelledPredicate>::Iter lp_iter; // Labelled predicates (previous BBs) iterator
 	}; // PredIterator class
 	
 	class MutablePredIterator: public PreIterator<MutablePredIterator, LabelledPredicate&> {
@@ -297,8 +297,8 @@ private:
 
 		friend class Analysis::State;
 		pred_iterator_state_t state;
-		SLList<LabelledPredicate>::MutableIterator gp_iter;
-		SLList<LabelledPredicate>::MutableIterator lp_iter;
+		elm::List<LabelledPredicate>::MutableIterator gp_iter;
+		elm::List<LabelledPredicate>::MutableIterator lp_iter;
 	};  
 
 	struct MemCell {

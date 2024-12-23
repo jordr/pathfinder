@@ -67,7 +67,7 @@ Block* clone(Block *b) {
 		// basic block
 		else {
 			otawa::BasicBlock *bb = b->toBasic();
-			genstruct::Vector<otawa::Inst *> insts(bb->count());
+			Vector<otawa::Inst *> insts(bb->count());
 			for(otawa::BasicBlock::InstIter i = bb; i; i++)
 				insts.add(*i);
 			return build(insts.detach());

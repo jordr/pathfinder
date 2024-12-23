@@ -363,7 +363,7 @@ String Analysis::printFixPointStatus(Block* b)
 */
 bool Analysis::isSubPath(const OrderedPath& included_path, const Path& path_set) 
 {
-	for(Path::Iterator iter(path_set); iter; iter++)
+	for(Path::Iter iter(path_set); iter; iter++)
 		if(!included_path.contains(*iter))
 			return false;
 	return true;
@@ -384,7 +384,7 @@ elm::String Analysis::pathToString(const Path& path)
 	{
 		elm::String str;
 		bool first = true;
-		for(Analysis::Path::Iterator iter(path); iter; iter++)
+		for(Analysis::Path::Iter iter(path); iter; iter++)
 		{
 			if(first)
 				first = false;
@@ -408,7 +408,7 @@ elm::String Analysis::pathToString(const OrderedPath& path)
 	elm::String str;
 	bool first = true;
 	int lastid = 0; // -Wmaybe-uninitialized
-	for(OrderedPath::Iterator iter(path); iter; iter++)
+	for(OrderedPath::Iter iter(path); iter; iter++)
 	{
 		ASSERTP(first || (*iter)->source()->index() == lastid, "OrderedPath previous target and current source do not match! ex: 1->2, 2->4, 3->5");
 		if(first)
@@ -553,7 +553,7 @@ int Analysis::simplifyUsingDominance(Option<Edge*> (*f)(GlobalDominance* gdom, E
 		{
 			changed = false;
 			elm::Option<DetailedPath::FlowInfo> prev = elm::none;
-			for(DetailedPath::Iterator i(dp); i; i++)
+			for(DetailedPath::Iter i(dp); i; i++)
 			{
 				if(i->isEdge())
 				{

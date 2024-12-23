@@ -78,7 +78,7 @@ elm::String pathToString(const Set<otawa::Edge*>& path)
 	{
 		elm::String str;
 		bool first = true;
-		for(Set<otawa::Edge*>::Iterator iter(path); iter; iter++)
+		for(Set<otawa::Edge*>::Iter iter(path); !iter.ended(); iter++)
 		{
 			if(first)
 				first = false;

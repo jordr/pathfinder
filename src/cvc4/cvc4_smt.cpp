@@ -57,15 +57,15 @@ CVC4SMT::CVC4SMT(int flags): SMT(flags), smt(&em), variables(em)
 
 // v1: all INITIAL_PREFIX "rk"
 // v2: INITIAL: "rk", VARIABLE: "?k". Predicates like "?0 = r0 + 1"
-void CVC4SMT::initialize(const SLList<LabelledPredicate>& labelled_preds)//, mode_t mode = VARIABLE_PREFIX)
+void CVC4SMT::initialize(const elm::List<LabelledPredicate>& labelled_preds)//, mode_t mode = VARIABLE_PREFIX)
 {
 	variables.setMode(INITIAL_PREFIX);
-	for(SLList<LabelledPredicate>::Iterator iter(labelled_preds); iter; iter++)
+	for(elm::List<LabelledPredicate>::Iter iter(labelled_preds); iter; iter++)
 		exprs.addLast(getExpr(iter->pred()));
 }
 
 // static int saved_useless_asserts = 0;
-void CVC4SMT::initialize(const LocalVariables& lv, const genstruct::HashTable<Constant, const Operand*, ConstantHash>& mem, DAG& dag)
+void CVC4SMT::initialize(const LocalVariables& lv, const elm::HashTable<Constant, const Operand*, ConstantHash>& mem, DAG& dag)
 {
 	variables.setMode(INITIAL_PREFIX);
 	BitVector used_regs(lv.maxRegisters(), false);
@@ -76,7 +76,7 @@ void CVC4SMT::initialize(const LocalVariables& lv, const genstruct::HashTable<Co
 	for(HashTable<Constant, const Operand*, ConstantHash>::KeyIterator iter(mem); iter; iter++)
 		v.push(dag.mem(*iter));
 	const int key_nb = v.count();
-	for(HashTable<Constant, const Operand*, ConstantHash>::Iterator iter(mem); iter; iter++)
+	for(HashTable<Constant, const Operand*, ConstantHash>::Iter iter(mem); iter; iter++)
 		for(Vector<const Operand*>::Iter vi(v); vi; )
 		{
 			if((*iter)->involvesOperand(**vi))
@@ -98,7 +98,7 @@ void CVC4SMT::initialize(const LocalVariables& lv, const genstruct::HashTable<Co
 	// saved_useless_asserts += v.count();
 #endif
 
-	for(genstruct::HashTable<Constant, const Operand*, ConstantHash>::PairIterator iter(mem); iter; iter++)
+	for(elm::HashTable<Constant, const Operand*, ConstantHash>::PairIterator iter(mem); iter; iter++)
 	{
 #ifndef DONT_REMOVE_USELESS_ASSERTS
 		if(v.contains(dag.mem((*iter).fst))) // useless assert
@@ -125,7 +125,7 @@ bool CVC4SMT::checkPredSat()
 {
 	try {
 		// std::time_t timestamp = clock(); // Timestamp before analysis
-		for(SLList<Option<Expr> >::Iterator iter(exprs); iter; iter++)
+		for(elm::List<Option<Expr> >::Iter iter(exprs); iter; iter++)
 			if(*iter) {
 				smt.assertFormula(**iter, true); // second parameter to true for unsat cores
 				// std::cout << **iter << endl; // uncomment to print all asserted predicates
@@ -166,7 +166,7 @@ bool CVC4SMT::checkPredSat()
 
 // get unsat core and build a shortened path accordingly
 // rtn false if failure, true otherwise
-bool CVC4SMT::retrieveUnsatCore(Analysis::Path& path, const SLList<LabelledPredicate>& labelled_preds, std::basic_string<char>& unsat_core_output)
+bool CVC4SMT::retrieveUnsatCore(Analysis::Path& path, const elm::List<LabelledPredicate>& labelled_preds, std::basic_string<char>& unsat_core_output)
 {
 	CVC4::UnsatCore unsat_core = smt.getUnsatCore(); // get an unsat subset of our assumptions
 	bool empty = true;
@@ -178,8 +178,8 @@ bool CVC4SMT::retrieveUnsatCore(Analysis::Path& path, const SLList<LabelledPredi
 		unsat_core_output += (*unsat_core_iter).toString();
 		empty = false;
 
-		SLList<LabelledPredicate>::Iterator lp_iter(labelled_preds);
-		SLList<Option<Expr> >::Iterator expr_iter(exprs);
+		elm::List<LabelledPredicate>::Iter lp_iter(labelled_preds);
+		elm::List<Option<Expr> >::Iter expr_iter(exprs);
 		for(; lp_iter; lp_iter++, expr_iter++)
 			if(*expr_iter && **expr_iter == *unsat_core_iter)
 				path += (*lp_iter).labels();

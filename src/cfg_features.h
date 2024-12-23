@@ -26,7 +26,8 @@
 #ifndef _CFG_FEATURES_H
 #define _CFG_FEATURES_H
 #include <elm/PreIterator.h>
-#include <elm/genstruct/SLList.h>
+#include <elm/data/List.h>
+#include <elm/option/Option.h>
 #include <otawa/cfg/CFG.h>
 #include <otawa/cfg/features.h>
 
@@ -35,7 +36,9 @@ using otawa::CFG;
 using otawa::LOOP_HEADER;
 using otawa::ENCLOSING_LOOP_HEADER;
 using elm::PreIterator;
-using elm::genstruct::SLList;
+using elm::Option;
+using namespace elm;
+
 
 extern bool cfg_follow_calls; // TODO!! dirty
 
@@ -49,13 +52,13 @@ template <class I, class T> inline T theOnly(PreIterator<I, T>& i) {
 template <class I, class T> inline T theOnly(const PreIterator<I, T>& i) 
 	{ I j(static_cast<const I&>(i)); return theOnly(j); }
 	// { ASSERT(i); T rtn = *i; I j(static_cast<const I&>(i)); ASSERT(!++j); return rtn; }
-template <class T> inline SLList<T> singleton(const T& x) { SLList<T> l; l.add(x); return l; }
+template <class T> inline elm::List<T> singleton(const T& x) { elm::List<T> l; l.add(x); return l; }
 
 Option<Block*> getCaller(CFG* cfg);
 Block* getCaller(CFG* cfg, Block* def);
 inline Block* getCaller(Block* b, Block* def) { return getCaller(b->cfg(), def); }
 
-// Loop Header Iterator for a virtualized CFG
+// Loop Header Iter for a virtualized CFG
 class LoopHeaderIter: public PreIterator<LoopHeaderIter, Block*> {
 public:
 	inline LoopHeaderIter(Block* b, bool inlined = true): lh(b)

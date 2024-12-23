@@ -22,7 +22,7 @@
 #ifndef _COMPOSITOR_H
 #define _COMPOSITOR_H
 
-#include <elm/genstruct/HashTable.h>
+#include <elm/data/HashTable.h>
 #include "analysis_state.h"
 // #include "strarith.h"
 #include "struct/DAG.h"
@@ -33,7 +33,7 @@
 // Compositor: a class for State composition
 class Compositor : public OperandEndoVisitor
 {
-	typedef genstruct::HashTable<Constant, const Operand*, ConstantHash> mem_t;
+	typedef elm::HashTable<Constant, const Operand*, ConstantHash> mem_t;
 public:
 	Compositor(const Analysis::State& s, bool sp_is_local)
 		: dag(s.getDag()), sp(NULL), lvars(s.getLocalVariables()), mem(s.getMemoryTable())

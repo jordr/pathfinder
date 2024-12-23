@@ -22,8 +22,8 @@
 #ifndef _INFEASIBLE_PATH_H
 #define _INFEASIBLE_PATH_H
 
-// #include <elm/genstruct/SLList.h> 
-#include <elm/genstruct/Vector.h>
+// #include <elm/data/List.h> 
+#include <elm/data/Vector.h>
 #include <elm/string/String.h>
 #include <otawa/cfg/CFG.h>
 #include <otawa/cfg/features.h>
@@ -32,8 +32,7 @@
 #include "cfg_features.h"
 #include "debug.h"
 
-using elm::genstruct::SLList;
-// using elm::genstruct::Vector;
+
 using otawa::Edge;
 using otawa::Block;
 using otawa::BasicBlock;
@@ -43,23 +42,23 @@ class DetailedPath
 {
 public:
 	class FlowInfo;
-	class Iterator;
+	class Iter;
 
 	DetailedPath(CFG* f = NULL);
 	DetailedPath(BasicBlock* bb); // initializes with LEn and CALL from context of b
-	// DetailedPath(const SLList<Edge*>& edge_list);
+	// DetailedPath(const elm::List<Edge*>& edge_list);
 	DetailedPath(const DetailedPath& dp);
 	
 	// SLList methods
 	inline void clear() { _path.clear(); }
-	void addBefore (const Iterator &pos, const FlowInfo &value);
+	void addBefore (const Iter &pos, const FlowInfo &value);
 	void addLast(Edge* e);
 	inline void addLast(const FlowInfo& fi) { _path.addLast(fi); }
 	inline bool contains(const FlowInfo &fi) const { return _path.contains(fi); }
-	inline SLList<FlowInfo>::Iterator find(const FlowInfo &fi) const { return _path.find(fi); }
+	inline elm::List<FlowInfo>::Iter find(const FlowInfo &fi) const { return _path.find(fi); }
 	inline void remove(Edge* e) { _path.remove(FlowInfo(e)); }
-	inline void remove(Iterator &iter) { _path.remove(iter); }
-	// inline void remove(Iterator &iter) { _path.remove(iter.getFlowInfoIter()); }
+	inline void remove(Iter &iter) { _path.remove(iter); }
+	// inline void remove(Iter &iter) { _path.remove(iter.getFlowInfoIter()); }
 	inline void removeLast() { _path.removeLast(); }
 	
 	// events
@@ -80,9 +79,9 @@ public:
 	Edge* lastEdge() const;
 	Option<Block*> lastBlock() const;
 	int countEdges() const;
-	SLList<Edge*> toOrderedPath() const;
+	elm::List<Edge*> toOrderedPath() const;
 	elm::String toString(bool colored = true) const;
-	inline const SLList<FlowInfo>& path() const { return _path; }
+	inline const elm::List<FlowInfo>& path() const { return _path; }
 	inline CFG* function() const { return fun; }
 	inline bool operator==(const DetailedPath& dp) const { return _path == dp._path && fun == dp.fun; }
 	inline const DetailedPath* operator->(void) const { return this; }
@@ -146,6 +145,7 @@ public:
 		inline EdgeIterator& operator=(const EdgeIterator& source) { dpath_iter = source.dpath_iter; return *this; }
 
 		inline bool ended(void) const { return done == true; }
+		operator bool() const { return !this->ended(); }
 		inline Edge* item(void) const { return dpath_iter.item().getEdge(); }
 		inline void next(void) { dpath_iter++; goToNextEdge(); }
 
@@ -161,14 +161,15 @@ public:
 			done = true; // only non-edges
 		}
 
-		SLList<FlowInfo>::Iterator dpath_iter;
+		elm::List<FlowInfo>::Iter dpath_iter;
 		bool done;
 	}; // EdgeIterator class
 
-	// Iterator class
-	class Iterator: public SLList<FlowInfo>::Iterator {
+	// Iter class
+	class Iter: public elm::List<FlowInfo>::Iter {
 	public:
-		inline Iterator(const DetailedPath& dpath) : SLList<FlowInfo>::Iterator(dpath._path) { }
+		inline Iter(const DetailedPath& dpath) : elm::List<FlowInfo>::Iter(dpath._path) { }
+		operator bool() const { return !this->ended(); }
 	};
 
 	void removeCallsAtEndOfPath();
@@ -177,7 +178,7 @@ private:
 	void removeAntagonists();
 	io::Output& print(io::Output& out) const;
 	
-	SLList<FlowInfo> _path;
+	elm::List<FlowInfo> _path;
 	CFG* fun;
 }; // DetailedPath class
 

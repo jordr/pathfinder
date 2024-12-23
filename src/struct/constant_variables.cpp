@@ -118,13 +118,13 @@ bool ConstantVariables::invalidateTempVars()
 }
 
 /**
- * @fn void ConstantVariables::merge(const SLList<ConstantVariables>& cvl);
+ * @fn void ConstantVariables::merge(const elm::List<ConstantVariables>& cvl);
  * This uses the current ConstantVariables and changes it to the result of the merge of it with the cvl list parameter
  */
 // TODO: we can improve this a lot
-void ConstantVariables::merge(const SLList<ConstantVariables>& cvl)
+void ConstantVariables::merge(const elm::List<ConstantVariables>& cvl)
 {
-	for(SLList<ConstantVariables>::Iterator iter(cvl); iter; iter++)
+	for(elm::List<ConstantVariables>::Iter iter(cvl); iter; iter++)
 	{
 		const ConstantVariables& cv = *iter;
 		ASSERTP(_max_tempvars == cv._max_tempvars && _max_registers == cv._max_registers, "ConstantVariables::merge: format does not match")
@@ -144,9 +144,9 @@ void ConstantVariables::merge(const SLList<ConstantVariables>& cvl)
 			registers[i] = LabelledValue(registers[i].val(), Set<Edge*>::null, true);
 }
 
-SLList<LabelledPredicate> ConstantVariables::toPredicates(DAG& dag) const
+elm::List<LabelledPredicate> ConstantVariables::toPredicates(DAG& dag) const
 {
-	SLList<LabelledPredicate> l;
+	elm::List<LabelledPredicate> l;
 	// all tempvars should be gone when toPredicates() is used, but we still handle them in case the method is used during the BB analysis
 	for(int i = _max_tempvars-1; i >= 0; i--)
 	{

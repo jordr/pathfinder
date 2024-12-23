@@ -45,7 +45,7 @@ using namespace otawa::sem;
 void Analysis::State::processBB(const BasicBlock *bb, VarMaker& vm, int flags)
 {
 	DBG("Processing " << (otawa::Block*)bb << " (" << bb->address() << ") of path " << dumpPath())
-	SLList<LabelledPredicate> generated_preds_before_condition;
+	elm::List<LabelledPredicate> generated_preds_before_condition;
 	generated_preds.clear();
 	generated_preds_taken.clear();
 	
@@ -272,7 +272,7 @@ bool Analysis::State::invalidateTempVars()
 	// First step: try and replace everything we can
 	do {
 		loop = false;
-		for(SLList<LabelledPredicate>::Iterator iter(generated_preds); iter; iter++)
+		for(elm::List<LabelledPredicate>::Iter iter(generated_preds); iter; iter++)
 		{
 			if(iter->pred().countTempVars())
 			{
@@ -293,7 +293,7 @@ bool Analysis::State::invalidateTempVars()
 	} while(loop);
 	
 	// Second step: remove everything that is left and still contains a tempvar
-	for(SLList<LabelledPredicate>::Iterator iter(generated_preds); iter; )
+	for(elm::List<LabelledPredicate>::Iter iter(generated_preds); iter; )
 	{
 		if(iter->pred().countTempVars())
 		{	// remove the predicate
@@ -447,7 +447,7 @@ bool Analysis::State::replaceVar(const OperandVar& var, const Operand* expr)
 bool Analysis::State::replaceTempVar(const OperandVar& temp_var, const Operand* expr)
 {
 	bool rtn = false;
-	for(SLList<LabelledPredicate>::Iterator iter(generated_preds); iter; iter++)
+	for(elm::List<LabelledPredicate>::Iter iter(generated_preds); iter; iter++)
 	{
 		if(iter->pred().involvesVariable(temp_var))
 		{
@@ -478,7 +478,7 @@ bool Analysis::State::replaceMem(const OperandMem& opdm, const Operand* expr, co
 {
 	bool rtn = false;
 	elm::String prev_str;
-	for(SLList<LabelledPredicate>::MutableIterator iter(generated_preds); iter; )
+	for(elm::List<LabelledPredicate>::MutableIterator iter(generated_preds); iter; )
 	{
 		if(dbg_verbose == DBG_VERBOSE_ALL)
 			prev_str = _ << iter.item().pred();
@@ -505,7 +505,7 @@ bool Analysis::State::replaceMem(const OperandMem& opdm, const Operand* expr, co
 		}
 		else iter++;
 	}
-	for(SLList<LabelledPredicate>::MutableIterator iter(labelled_preds); iter; )
+	for(elm::List<LabelledPredicate>::MutableIterator iter(labelled_preds); iter; )
 	{
 		if(dbg_verbose == DBG_VERBOSE_ALL)
 			prev_str = _ << iter.item();

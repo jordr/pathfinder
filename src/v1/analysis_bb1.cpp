@@ -804,7 +804,7 @@ bool Analysis::State::findValueOfCompVar(const OperandVar& var, Operand const*& 
 {
 	// We only explore the local generated_preds. This seems reasonable since we should be able to find this predicate in the local BB
 	// BUT this does not exempt us from looking for labels because these predicates can be themselves associated to predicates of previous BBs
-	for(SLList<LabelledPredicate>::Iterator iter(generated_preds); iter; iter++)
+	for(elm::List<LabelledPredicate>::Iter iter(generated_preds); iter; iter++)
 	{
 		const Predicate& p = iter->pred();
 		if(p.opr() == CONDOPR_EQ) // operator is =

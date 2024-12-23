@@ -22,7 +22,7 @@
 /*
  * Implementing z3 as the SMT solver
  */
-#include <elm/genstruct/SLList.h>
+#include <elm/data/List.h>
 #include "z3_operand_visitor.h"
 #include "../debug.h"
 #include "z3_smt.h"
@@ -33,9 +33,9 @@ Z3SMT::Z3SMT(int flags): SMT(flags), s(c), p(c), sp(c.int_const("SP"))
 	s.set(p);
 }
 
-void Z3SMT::initialize(const SLList<LabelledPredicate>& labelled_preds)
+void Z3SMT::initialize(const elm::List<LabelledPredicate>& labelled_preds)
 {
-	for(SLList<LabelledPredicate>::Iterator iter(labelled_preds); iter; iter++)
+	for(elm::List<LabelledPredicate>::Iter iter(labelled_preds); iter; iter++)
 	{
 		const Predicate& p = iter->pred();
 		if(p.isComplete())
@@ -56,7 +56,7 @@ bool Z3SMT::checkPredSat()
 
 // get unsat core and build a shortened path accordingly
 // rtn false if failure, true otherwise
-bool Z3SMT::retrieveUnsatCore(Analysis::Path& path, const SLList<LabelledPredicate>& labelled_preds, std::basic_string<char>& unsat_core_output)
+bool Z3SMT::retrieveUnsatCore(Analysis::Path& path, const elm::List<LabelledPredicate>& labelled_preds, std::basic_string<char>& unsat_core_output)
 {
 	z3::expr_vector core = s.unsat_core();
 	bool empty = true;
@@ -69,7 +69,7 @@ bool Z3SMT::retrieveUnsatCore(Analysis::Path& path, const SLList<LabelledPredica
 		empty = false;
 
 		Vector<unsigned int>::Iter labels_hash_iter(labels_hash);
-		for(SLList<LabelledPredicate>::Iterator lp_iter(labelled_preds); lp_iter; lp_iter++)
+		for(elm::List<LabelledPredicate>::Iter lp_iter(labelled_preds); lp_iter; lp_iter++)
 		{	
 			if(!lp_iter->pred().isComplete())
 				continue;

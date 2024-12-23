@@ -24,8 +24,8 @@
 
 #include <elm/array.h>
 #include <elm/types.h>
-#include <elm/genstruct/HashTable.h>
-#include <elm/genstruct/quicksort.h>
+#include <elm/data/HashTable.h>
+#include <elm/data/quicksort.h>
 #include <elm/io/Output.h>
 #include <otawa/program.h>
 #include "arith.h"
@@ -96,9 +96,9 @@ class DAG {
 		}
 	};
  
- 	typedef genstruct::HashTable<Key,      Operand *,   SelfHashKey<Key> >  op_map_t;
- 	typedef genstruct::HashTable<Pred,     Predicate *, SelfHashKey<Pred> > pred_map_t;
- 	typedef genstruct::HashTable<Constant, Operand *,   ConstantHash>       cst_map_t;
+ 	typedef elm::HashTable<Key,      Operand *,   SelfHashKey<Key> >  op_map_t;
+ 	typedef elm::HashTable<Pred,     Predicate *, SelfHashKey<Pred> > pred_map_t;
+ 	typedef elm::HashTable<Constant, Operand *,   ConstantHash>       cst_map_t;
 
 #	ifdef DAG_SUM
 	class Sum: public OperandVisitor {
@@ -156,7 +156,7 @@ class DAG {
 				crash();
 				break;
 			}
-			genstruct::quicksort<Pair<bool, const Operand *>, genstruct::Vector, Compare>(args);
+			genstruct::quicksort<Pair<bool, const Operand *>, Vector, Compare>(args);
 
 			// rebuild the expression
 			int i = args.count() - 2;
@@ -180,7 +180,7 @@ class DAG {
 	private:
 		DAG& _dag;
 		bool _neg;
-		genstruct::Vector<Pair<bool, const Operand *> > args;
+		Vector<Pair<bool, const Operand *> > args;
 	}; // Sum class
 #	endif
 

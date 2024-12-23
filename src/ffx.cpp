@@ -88,7 +88,7 @@ void FFX::sanitizeCallReturns(void)
 		Vector<Option<SynthBlock*> > callers;
 			caller_q.push(ip->function());
 			callers.push(elm::none);
-		for(DetailedPath::Iterator iter(ip); iter; iter++)
+		for(DetailedPath::Iter iter(ip); iter; iter++)
 		{
 			if(iter->isEdge())
 			{
@@ -145,11 +145,11 @@ void FFX::outputSortedInfeasiblePaths(io::Output& FFXFile)
  */
 void FFX::printInfeasiblePath(io::Output& FFXFile, const DetailedPath& ip)
 {
-	SLList<ffx_tag_t> open_tags;
-	SLList<Block*> caller_q;
+	elm::List<ffx_tag_t> open_tags;
+	elm::List<Block*> caller_q;
 	// int active_loops = 0, active_calls = 0;
 	FFXFile	<< indent(  ) << "<not-all seq=\"true\">" << endl; indent(+1);
-	for(DetailedPath::Iterator iter(ip); iter; iter++)
+	for(DetailedPath::Iter iter(ip); iter; iter++)
 	{
 		if(iter->isEdge())
 		{
@@ -173,7 +173,7 @@ void FFX::printInfeasiblePath(io::Output& FFXFile, const DetailedPath& ip)
 				// cerr << "WARNING: infeasible path includes return edge of sub-CFG \"" << subcfg->name() 
 				// 	 << "\" called from \"" << e->source()->toSynth()->caller() << "\"" << endl;
 				bool includes_edge_in_subCFG = false;
-				for(DetailedPath::Iterator new_iter(ip); *new_iter != *iter; new_iter++)
+				for(DetailedPath::Iter new_iter(ip); *new_iter != *iter; new_iter++)
 					if(new_iter->isEdge() && new_iter->getEdge()->source()->cfg() == subcfg) {
 						includes_edge_in_subCFG = true;
 						// cerr << "\tfound some edge in called CFG: " << new_iter->getEdge() << ", skipping return edge" << endl;
@@ -315,7 +315,7 @@ void FFX::printInfeasiblePath(io::Output& FFXFile, const DetailedPath& ip)
 		else crash(); // we should handle all kinds
 	}
 	// close running <loop ... > environments
-	for(SLList<ffx_tag_t>::Iterator open_tags_iter(open_tags); !open_tags_iter.ended(); open_tags_iter++)
+	for(elm::List<ffx_tag_t>::Iter open_tags_iter(open_tags); !open_tags_iter.ended(); open_tags_iter++)
 	{
 		switch(*open_tags_iter)
 		{
@@ -367,7 +367,7 @@ void FFX::writeGraph(io::Output& GFile, const Vector<DetailedPath>& ips)
 bool FFX::checkPathValidity(const DetailedPath& ip, bool critical) const
 {
 	Vector<DetailedPath::FlowInfo> v;
-	for(DetailedPath::Iterator iter(ip); iter; iter++)
+	for(DetailedPath::Iter iter(ip); iter; iter++)
 		switch(iter->kind())
 		{
 			case DetailedPath::FlowInfo::KIND_EDGE: // Edge
@@ -443,14 +443,14 @@ void FFX::printInfeasiblePathOldNomenclature(io::Output& FFXFile, const Detailed
 }
 
 /**
- * bool FFX::nextElementisCall(const DetailedPath::Iterator& iter, CFG* cfg);
+ * bool FFX::nextElementisCall(const DetailedPath::Iter& iter, CFG* cfg);
  * @brief test if the next element in the DetailedPath is a call to cfg
  * @param current iterator on the detailed path
  * @param cfg called CFG to match with
 */
-bool FFX::nextElementisCall(const DetailedPath::Iterator& iter, CFG* cfg)
+bool FFX::nextElementisCall(const DetailedPath::Iter& iter, CFG* cfg)
 {
-	DetailedPath::Iterator new_iter(iter);
+	DetailedPath::Iter new_iter(iter);
 	new_iter++;
 	if(!new_iter)
 		return false;
@@ -474,11 +474,11 @@ elm::String FFX::indent(int indent_increase)
 }
 
 /**
- * @fn bool FFX::lastIsCaller(SLList<ffx_tag_t> open_tags)
+ * @fn bool FFX::lastIsCaller(elm::List<ffx_tag_t> open_tags)
  * @brief      Gets the last caller from a list of open tags.
  * @param      open_tags  The open tags
  */
-bool FFX::lastIsCaller(SLList<ffx_tag_t> open_tags)
+bool FFX::lastIsCaller(elm::List<ffx_tag_t> open_tags)
 {
 	return open_tags && open_tags.first() == FFX_TAG_CALL;
 }

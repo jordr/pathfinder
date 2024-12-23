@@ -66,7 +66,7 @@ public:
 			}
 
 			if(flags&EDGE_POSTDOM) {
-				genstruct::SLList<otawa::sgraph::Edge*> sl; 
+				elm::List<otawa::sgraph::Edge*> sl; 
 				for(Block::EdgeIter i(cfg->exit()->ins()); i; i++)
 					sl += *i;
 				epdoms.put(*cfg, new EdgePostDom(*cfg, sl));
@@ -77,11 +77,11 @@ public:
 	}
 
 	~GlobalDominance() {
-		for(genstruct::HashTable<CFG*, BlockDominance*>::PairIterator i(bdoms); i; i++)
+		for(elm::HashTable<CFG*, BlockDominance*>::PairIterator i(bdoms); i; i++)
 			delete (*i).snd;
-		for(genstruct::HashTable<CFG*, EdgeDom*>::PairIterator i(edoms); i; i++)
+		for(elm::HashTable<CFG*, EdgeDom*>::PairIterator i(edoms); i; i++)
 			delete (*i).snd;
-		for(genstruct::HashTable<CFG*, EdgePostDom*>::PairIterator i(epdoms); i; i++)
+		for(elm::HashTable<CFG*, EdgePostDom*>::PairIterator i(epdoms); i; i++)
 			delete (*i).snd;
 	}
 
@@ -141,9 +141,9 @@ public:
 	}
 
 private:
-	genstruct::HashTable<CFG*, BlockDominance*> bdoms;
-	genstruct::HashTable<CFG*, EdgeDom*> edoms;
-	genstruct::HashTable<CFG*, EdgePostDom*> epdoms;
+	elm::HashTable<CFG*, BlockDominance*> bdoms;
+	elm::HashTable<CFG*, EdgeDom*> edoms;
+	elm::HashTable<CFG*, EdgePostDom*> epdoms;
 	// BlockDominanceGen<PCGBlock, PCGEdge> pcg_dom;
 };
 

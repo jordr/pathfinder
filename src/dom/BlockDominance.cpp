@@ -34,10 +34,10 @@ void BlockDominance::RPO::process(DiGraph *g)
 	/* O ← [] */ // order
 	O.clear();
 	/* S ← [ε] */ // stack
-	genstruct::SLList<Vertex*> S;
+	elm::List<Vertex*> S;
 	S.add(g->entry());
 	/* D ← { } */ // done
-	genstruct::Vector<Vertex*> D;
+	Vector<Vertex*> D;
 	/* while S ≠ [] do */
 	while(S) {
 		/* v ← hd S */
@@ -77,7 +77,7 @@ void BlockDominance::DominanceProblem(DiGraph *g) {
 		/* Changed ← false */
 		changed = false;
 		/* for all nodes, b, in reverse postorder (except start node) */
-		for(RPO::Iterator b(rpo.toList()); b; b++) {
+		for(RPO::Iter b(rpo.toList()); b; b++) {
 			if(b == g->entry())
 				continue;
 			/* new idom ← first (processed) predecessor of b // (pick one) */
@@ -122,7 +122,7 @@ Vertex* BlockDominance::intersect(Vertex* b1, Vertex* b2) {
 
 io::Output& BlockDominance::print(io::Output& out) const {
 	bool first = true;
-	for(genstruct::HashTable<Vertex*, Vertex*>::PairIterator i(doms); i; i++) {
+	for(elm::HashTable<Vertex*, Vertex*>::PairIterator i(doms); i; i++) {
 		out << (first?"":",  ") << (*i).fst << ":" << (*i).snd;
 		first = false;
 	}

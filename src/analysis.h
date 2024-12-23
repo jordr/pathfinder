@@ -31,7 +31,7 @@
 
 // #define V1 // v1 support (slows down v2 and v3)
 
-// #include <elm/genstruct/SLList.h>
+// #include <elm/data/List.h>
 #include <otawa/cfg/Edge.h>
 #include <otawa/cfg/features.h>
 #include <otawa/dfa/State.h>
@@ -46,11 +46,11 @@
 #include "working_list.h"
 
 using namespace otawa;
-using elm::genstruct::SLList;
+
 
 class Analysis {
 public:
-	typedef SLList<Edge*> OrderedPath;
+	typedef elm::List<Edge*> OrderedPath;
 	typedef elm::avl::Set<Edge*> Path;
 	class State; // Abstract state corresponding to a set of paths at one point of the program
 	class States; // Collection of State representing an abstract state at one point of the program

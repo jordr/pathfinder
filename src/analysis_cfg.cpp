@@ -44,7 +44,7 @@ Identifier<Analysis::State>					Analysis::LH_S("Trace on a loop header"); // may
 Identifier<Analysis::loopheader_status_t>	Analysis::LH_STATUS("Fixpt status of a loop (on a loop header)");
 // for non-virtualized CFGs only
 Identifier<Analysis::State>					Analysis::LH_S0("Initial trace on a loop header"); // maybe change to vector
-Identifier<OperandIter*>					Analysis::LH_I("Iterator operand for the loop"); // on lheaders
+Identifier<OperandIter*>					Analysis::LH_I("Iter operand for the loop"); // on lheaders
 Identifier<LockPtr<Analysis::States> >		Analysis::CFG_S("Trace on a CFG");
 Identifier<LockPtr<VarMaker> >				Analysis::CFG_VARS("VarMaker of a CFG"); // VarMaker to be copied, updated, and appended on f° return
 
@@ -99,7 +99,7 @@ bool Analysis::allEdgesHaveTrace(const Vector<Edge*>& edges) const
 /**
  * @fn bool Analysis::allEdgesHaveTrace(const Block::EdgeIter& biter) const;
  * @brief Checks for all edges to have a trace annotation
- * @param biter Iterator over the list of Block edges to inspect
+ * @param biter Iter over the list of Block edges to inspect
  * @return true iff all edges have a trace annotation
  */
 bool Analysis::allEdgesHaveTrace(const Block::EdgeIter& biter) const
@@ -127,7 +127,7 @@ bool Analysis::anyEdgeHasTrace(const Vector<Edge*>& edges) const
 /**
  * @fn bool Analysis::anyEdgeHasTrace(const Block::EdgeIter& biter) const;
  * @brief Checks for at least one edge to have a trace annotation
- * @param biter Iterator over the list of Block edges to inspect
+ * @param biter Iter over the list of Block edges to inspect
  * @return true iff at least one edge has a trace annotation
  */
 bool Analysis::anyEdgeHasTrace(const Block::EdgeIter& biter) const
@@ -170,7 +170,7 @@ DetailedPath Analysis::reorderInfeasiblePath(const Path& ip, const DetailedPath&
 {
 	DetailedPath ordered_ip(full_path.function());
 	// parse the detailed path and add all the edges that match the Path ip and the loop entries
-	for(DetailedPath::Iterator full_path_iter(full_path); full_path_iter; full_path_iter++)
+	for(DetailedPath::Iter full_path_iter(full_path); full_path_iter; full_path_iter++)
 	{
 		if(full_path_iter->isEdge())
 		{

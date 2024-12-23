@@ -22,7 +22,7 @@
 #ifndef _ORACLE_H
 #define _ORACLE_H
 
-#include <elm/genstruct/Vector.h>
+#include <elm/data/Vector.h>
 #include <otawa/cfg/Edge.h>
 #include "analysis.h"
 #include "detailed_path.h"

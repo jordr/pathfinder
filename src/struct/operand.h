@@ -23,8 +23,8 @@
 #define _OPERAND_H
 
 #include <otawa/cfg/Edge.h>
-#include <elm/genstruct/SLList.h>
-#include <elm/genstruct/Vector.h>
+#include <elm/data/List.h>
+#include <elm/data/Vector.h>
 #include <elm/io/Output.h>
 #include <elm/util/BitVector.h>
 #include <elm/util/Option.h>
@@ -33,8 +33,8 @@
 #include "var_collector.h"
 
 using otawa::Edge;
-using elm::genstruct::SLList;
-// using elm::genstruct::Vector;
+
+// using elm::Vector;
 
 enum arithoperator_t
 {
@@ -172,7 +172,7 @@ public:
 	private:
 		void check();
 
-		SLList<const Operand*> q;
+		elm::List<const Operand*> q;
 		const int flags;
 	};
 private:

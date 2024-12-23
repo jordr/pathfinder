@@ -75,7 +75,7 @@ void Analysis::State::appendEdge(Edge* e)
 	// add edge to the end of the path
 	this->path.addLast(e);
 	// we now need to label the correct list of predicates
-	SLList<LabelledPredicate> &relevant_preds = (isConditional(e->source()) && e->isTaken())
+	elm::List<LabelledPredicate> &relevant_preds = (isConditional(e->source()) && e->isTaken())
 		? generated_preds_taken // conditional TAKEN
 		: generated_preds; // non-conditional, NOT TAKEN
 	labelled_preds += labelPredicateList(relevant_preds, e); // label our list of predicates with the current edge then append it
@@ -129,10 +129,10 @@ void Analysis::State::removePredicate(PredIterator &iter)
 	iter.updateState();
 }
 
-SLList<LabelledPredicate> Analysis::State::labelPredicateList(const SLList<LabelledPredicate>& pred_list, Edge* label)
+elm::List<LabelledPredicate> Analysis::State::labelPredicateList(const elm::List<LabelledPredicate>& pred_list, Edge* label)
 {
-	SLList<LabelledPredicate> rtn;
-	for(SLList<LabelledPredicate>::Iterator iter(pred_list); iter; iter++)
+	elm::List<LabelledPredicate> rtn;
+	for(elm::List<LabelledPredicate>::Iter iter(pred_list); iter; iter++)
 	{
 		LabelledPredicate lp(*iter);
 		lp.addLabel(label);
@@ -254,7 +254,7 @@ void Analysis::State::applyPredicates(const State& s, OperandEndoVisitor& cc, bo
 {
 	// update their predicates then add them to us
 	// be careful about multiplying per negative numbers? or not actually. I think it's a simple substitution
-	for(SLList<LabelledPredicate>::Iterator pi(s.labelled_preds); pi; pi++)
+	for(elm::List<LabelledPredicate>::Iter pi(s.labelled_preds); pi; pi++)
 	{
 		Predicate p = pi->pred();
 		if(wipe_memory && p.involvesMemory())
@@ -370,7 +370,7 @@ void Analysis::State::widening(const Operand* n)
 			lvars[*i] = Top;
 		}
 	}
-	SLList<Constant> scratchs;
+	elm::List<Constant> scratchs;
 	for(mem_t::PairIterator i(mem); i; i++)
 	{
 		if(!wprogress[*i])
@@ -380,7 +380,7 @@ void Analysis::State::widening(const Operand* n)
 			scratchs += (*i).fst;
 		}
 	}
-	for(SLList<Constant>::Iterator i(scratchs); i; i++)
+	for(elm::List<Constant>::Iter i(scratchs); i; i++)
 		mem[*i] = Top;
 
 	DBGG(Blu() << "Widening done, resulting in: " << this->dumpEverything())
@@ -494,7 +494,7 @@ void Analysis::State::merge(const States& ss, Block* b, VarMaker& vm)
 	generated_preds_taken.clear();
 	labelled_preds.clear();
 #ifdef V1
-	SLList<ConstantVariables> cvl;
+	elm::List<ConstantVariables> cvl;
 	constants = ss.first().constants;
 #endif
 	lvars = ss.first().lvars;
@@ -505,7 +505,7 @@ void Analysis::State::merge(const States& ss, Block* b, VarMaker& vm)
 	// int i = 0;
 	// intialize to first element
 	// copy firstElement.labelled_preds into labelled_preds with empty labels
-	for(SLList<LabelledPredicate>::Iterator iter(ss.first().labelled_preds); iter; iter++)
+	for(elm::List<LabelledPredicate>::Iter iter(ss.first().labelled_preds); iter; iter++)
 		labelled_preds += LabelledPredicate(iter->pred(), Path::null);
 	bool first = true;
 	for(States::Iter siter(ss); siter; siter++)
@@ -537,11 +537,11 @@ void Analysis::State::merge(const States& ss, Block* b, VarMaker& vm)
 		cvl += (*siter).constants; // constants.merge(...) uses the info from "constants" so it's useless to add it at the first iteration
 #endif
 		// for each element of labelled_preds, we make sure it is in *siter
-		for(SLList<LabelledPredicate>::Iterator iter(labelled_preds); iter; )
+		for(elm::List<LabelledPredicate>::Iter iter(labelled_preds); iter; )
 		{
 			// do not use 'if(s.labelled_preds.contains(*iter))' as we want to use Predicate::operator== and not LabelledPredicate::operator==
 			bool contains = false;
-			for(SLList<LabelledPredicate>::Iterator subiter((*siter).labelled_preds); subiter; subiter++)
+			for(elm::List<LabelledPredicate>::Iter subiter((*siter).labelled_preds); subiter; subiter++)
 			{
 				if((*subiter).pred() == iter->pred())
 				{
@@ -614,7 +614,7 @@ void Analysis::State::collectTops(VarCollector& vc) const
 	for(LocalVariables::Iter i(lvars); i; i++)
 		if(lvars[i])
 			lvars[i]->collectTops(vc);
-	for(mem_t::Iterator i(mem); i; i++)
+	for(mem_t::Iter i(mem); i; i++)
 		i->collectTops(vc);
 	for(PredIterator pi(*this); pi; pi++)
 		pi->collectTops(vc);
@@ -699,10 +699,10 @@ bool Analysis::State::equiv(const Analysis::State& s) const
 		return false;
 	// if(this->labelled_preds.count() != s.labelled_preds.count()) // This doesn't work because we sometimes add true values at each iteration
 	// 	return false;
-	for(SLList<LabelledPredicate>::Iterator self_iter(this->labelled_preds); self_iter; self_iter++)
+	for(elm::List<LabelledPredicate>::Iter self_iter(this->labelled_preds); self_iter; self_iter++)
 	{
 		bool contains = false;
-		for(SLList<LabelledPredicate>::Iterator s_iter(s.labelled_preds); s_iter; s_iter++)
+		for(elm::List<LabelledPredicate>::Iter s_iter(s.labelled_preds); s_iter; s_iter++)
 		{
 			if(self_iter->pred() == s_iter->pred())
 			{

@@ -23,7 +23,7 @@
 #define _ANALYSIS_SEM2_H
 
 class Analysis::State::SemanticParser
-{	// TODO: make it act like an Iterator, and make a SemanticParser for v1 too
+{	// TODO: make it act like an Iter, and make a SemanticParser for v1 too
 public:
 	SemanticParser(State& s, VarMaker& vm) : s(s), vm(vm), lvars(s.lvars), dag(*s.dag), last_condition(sem::NOP) { }
 	int process(const sem::PathIter& seminsts);
